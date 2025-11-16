@@ -2,7 +2,8 @@ import { User } from "../models/user.models.js";
 import {ApiResponse} from "../utils/api-response.js"
 import { ApiError } from "../utils/api-error.js"
 import { asyncHandler } from "../utils/async-handler.js"
-import {sendEmail} from "../utils/mail.js"
+import { sendEmail, emailVerification } from "../utils/mail.js"; 
+
 
 
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -50,9 +51,10 @@ const registerUser = asyncHandler(async (req, res) => {
         email: user?.email,
         subject: " plij verify your email",
         mailgenContent: emailVerification(
-            user.username,
-            `${req.protocol}://${req.get("host")}/api/vi/users/verify-email/${unHashedToken}`
-        ),
+  user.username,
+  `${req.protocol}://${req.get("host")}/api/v1/users/verify-email/${unHashedToken}`
+),
+
     })
 
     const createdUser = await User.findById(user._id).select("-password -refreshToken -emailVerificationToken -emailVerificationExpiry")
@@ -74,4 +76,14 @@ const registerUser = asyncHandler(async (req, res) => {
 
 })
 
-export { registerUser };
+
+const login =  asyncHandler(async (req, res) => {
+    const {email, password, username} = req.body
+
+    if(!username || !email){
+        throw new ApiError(400, "Username or email is required")
+    };
+
+});
+
+export { registerUser, login };
